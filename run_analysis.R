@@ -12,7 +12,7 @@ subjectTrain <- read.table("UCI HAR Dataset/train/subject_train.txt")
 variableNames <- read.table("UCI HAR Dataset/features.txt")
 activityNames <- read.table("UCI HAR Dataset/activity_labels.txt")
 
-# Names the Variables (make this a function that can be called with the train data as well
+# Names the combines all the required col and names them with the appropriate names
 	nameandcombine <- function(x,y,z){
 		
 		namedXraw <- x
@@ -24,7 +24,7 @@ activityNames <- read.table("UCI HAR Dataset/activity_labels.txt")
 		xycombined <- cbind(namedXraw,namedYraw,namedSubjects)
 		return(xycombined)
 }
-# Feed it xycombined$activitytype and replace all numbered values with the names in the list. To be used with lapply
+# Feed it a value and it will replace it with the string stored in activityNames.
 	nameactivity <- function(x) {	
 		if (x == 1){(x = as.character(activityNames[1,2]))}
 		if (x == 2){(x = as.character(activityNames[2,2]))}
@@ -34,20 +34,24 @@ activityNames <- read.table("UCI HAR Dataset/activity_labels.txt")
 		if (x == 6){(x = as.character(activityNames[6,2]))}
 		x
 }
-#The below set of commands will read in both test and train data,name the variables, bind them together, and name the activity types.
+#Makes a table of both test and train data sets, stored in table1 and table2 respectively. It then binds them into one complete table.
 
 
 table1 <- nameandcombine(XtextTestraw,YtextTestraw,subjectTest)
 table2 <- nameandcombine(XtextTrainraw,YtextTrainraw,subjectTrain)
 table3 <- rbind(table1,table2)
+
+#Replaces all the activitytype number values with the associated name
 table3$activitytype <- sapply(table3$activitytype, nameactivity)
 
-#Creates a unique list of indexes that contain only the required cols and stores them in indexlist
+
+#Makes a list of the indicies containing the cols required for the final data set.
 indexlist <- c(grep("mean",names(table3)),grep("std",names(table3)),grep("activitytype",names(table3)),grep("subject",names(table3)))
 
-#makes the data only the desired values, then groups by activity type and subject. Displays the mean of each other col.
+#table4 is the final table, it contains all measurments of both test and train that contain a mean or standard deviation value.
+
 table4 <- table3[,indexlist]
 tidytable <- group_by(table4, subject,activitytype) %>% summarise_all(mean)
 
-
+#Outputs tidy Data to a text file
 write.table(tidytable, file = "dataOutput.txt")
