@@ -41,10 +41,13 @@ table1 <- nameandcombine(XtextTestraw,YtextTestraw,subjectTest)
 table2 <- nameandcombine(XtextTrainraw,YtextTrainraw,subjectTrain)
 table3 <- rbind(table1,table2)
 table3$activitytype <- sapply(table3$activitytype, nameactivity)
+
+#Creates a unique list of indexes that contain only the required cols and stores them in indexlist
 indexlist <- c(grep("mean",names(table3)),grep("std",names(table3)),grep("activitytype",names(table3)),grep("subject",names(table3)))
+
+#makes the data only the desired values, then groups by activity type and subject. Displays the mean of each other col.
 table4 <- table3[,indexlist]
-tidytable <- group_by(table4, subject,activitytype)
-#tidytable <- group_by(tidytable, subject)
-tidytable <- summarise_all(tidytable, mean)
+tidytable <- group_by(table4, subject,activitytype) %>% summarise_all(mean)
+
 
 write.table(tidytable, file = "dataOutput.txt")
