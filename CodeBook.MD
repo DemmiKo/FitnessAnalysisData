@@ -1,6 +1,6 @@
 Code Book
 ==
-##Variables in the output
+Variables in the output
 --
 
 ##subject:
